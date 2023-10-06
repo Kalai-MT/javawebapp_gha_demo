@@ -1,9 +1,13 @@
-name: Java CI with Gradle
+name: CI-CD
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - main
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -29,11 +33,9 @@ jobs:
       with:
         token_format: 'access_token'
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-      #  install_components: 'gke-gcloud-auth-plugin'
-      #  workload_identity_provider: 'projects/136465850127/locations/global/workloadIdentityPools/gha-demo-pool/providers/gha-demo-provider'
-      #  service_account: 'github-actions-demo@github-actions-demo-400806.iam.gserviceaccount.com'
-    - run: echo "${{ steps.auth.outputs.access_token }}"
-    - uses: 'docker/login-action@v1'
+    
+    - name: Docker Login
+      uses: 'docker/login-action@v1'
       with:
         registry: 'asia-south1-docker.pkg.dev'
         username: 'oauth2accesstoken'
@@ -56,20 +58,10 @@ jobs:
       with: 
         install_components: 'gke-gcloud-auth-plugin' 
         
-    - name: Deploy
-      run: |
-        gcloud container clusters get-credentials cluster-1 --zone us-central1-a --project github-actions-demo-400806
-        kubectl get nodes
-        kubectl apply -f deployment.yml
-  #  - name: Configure Docker to use gcloud
+   # - name: Deploy
    #   run: |
-    #    gcloud auth configure-docker asia-south1-docker.pkg.dev
-    #    docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/sample-java-app/hello-world:latest .
-     #   docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/sample-java-app/hello-world:latest
-          
-  #  - name: Push to Google Artifact Registry
-  #    run: docker push asia-south1-docker.pkg.dev/github-actions-demo-400806/sample-java-app/hello-world:latest
-    
-
-    
+   #     gcloud container clusters get-credentials cluster-1 --zone us-central1-a --project github-actions-demo-400806
+   #     kubectl get nodes
+   #     kubectl apply -f deployment.yml
+  
     
